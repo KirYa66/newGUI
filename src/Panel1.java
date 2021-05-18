@@ -13,6 +13,8 @@ public class Panel1 {
         JPanel panel = new JPanel();
         panel.setBackground(Color.darkGray);
 
+        panel.setLayout(new BoxLayout(panel,BoxLayout.Y_AXIS));
+
         JButton button = new JButton("shock me");
         panel.add(button);
         JButton buttonTwo = new JButton("bliss");
