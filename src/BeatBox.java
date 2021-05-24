@@ -1,8 +1,11 @@
+import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Sequence;
 import javax.sound.midi.Sequencer;
 import javax.sound.midi.Track;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 public class BeatBox {
@@ -48,5 +51,74 @@ public class BeatBox {
         downTempo.addActionListener(new MySDownTempoListener());
         buttonBox.add(downTempo);
 
+        Box nameBox = new Box(BoxLayout.Y_AXIS);
+        for (int i = 0; i < 16; i++) {
+            nameBox.add(new Label(instrumentNames[i]));
+        }
+
+        background.add(BorderLayout.EAST,buttonBox);
+        background.add(BorderLayout.WEST,nameBox);
+
+        theFrame.getContentPane().add(background);
+
+        GridLayout grid = new GridLayout(16,16);
+        grid.setVgap(1);
+        grid.setHgap(2);
+        mainPanel = new JPanel(grid);
+        background.add(BorderLayout.CENTER, mainPanel);
+
+        for (int i = 0; i < 256; i++) {
+            JCheckBox c = new JCheckBox();
+            c.setSelected(false);
+            checkboxList.add(c);
+            mainPanel.add(c);
+        }
+
+        setUpMidi();
+
+        theFrame.setBounds(50,50,300,300);
+        theFrame.pack();
+        theFrame.setVisible(true);
+
+    }
+
+    private void setUpMidi() {
+        try {
+            sequencer = MidiSystem.getSequencer();
+            sequencer.open();
+            sequence = new Sequence(Sequence.PPQ,4);
+            track = sequence.createTrack();
+            sequencer.setTempoInBPM(120);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private class MyStartListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+        }
+    }
+
+    private class MyStopListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+        }
+    }
+
+    private class MySUpTempoListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+        }
+    }
+
+    private class MySDownTempoListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+        }
     }
 }
