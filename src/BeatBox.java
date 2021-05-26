@@ -1,7 +1,4 @@
-import javax.sound.midi.MidiSystem;
-import javax.sound.midi.Sequence;
-import javax.sound.midi.Sequencer;
-import javax.sound.midi.Track;
+import javax.sound.midi.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -94,31 +91,86 @@ public class BeatBox {
         }
     }
 
+    public  void buildTrackAndStart() {
+        int[] trackList = null;
+
+        sequence.deleteTrack(track);
+        track = sequence.createTrack();
+
+        for (int i = 0; i < 16; i++) {
+            trackList = new int[16];
+            int key = instruments[i];
+            for (int j = 0; j < 16; j++) {
+                JCheckBox jc = (JCheckBox) checkboxList.get(j+(16*i));
+                if (jc.isSelected()) {
+                    trackList[j] = key;
+                } else {
+                    trackList[j] = 0;
+                }
+
+            }
+            makeTracks(trackList);
+            track.add(makeEvent(176,1,127,0,16));
+        }
+        track.add(makeEvent(192,9,1,0,15));
+        try {
+            sequencer.setSequence(sequence);
+            sequencer.setLoopCount(sequencer.LOOP_CONTINUOUSLY);
+            sequencer.start();
+            sequencer.setTempoInBPM(120);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void makeTracks(int[] list) {
+        for (int i = 0 ; i < 16; i++) {
+            int key = list[i];
+            if (key !=0) {
+                track.add(makeEvent(144,9,key,100,i));
+                track.add(makeEvent(128,9,key,100,i+1));
+            }
+        }
+
+    }
+
+    private MidiEvent makeEvent(int comd, int chan, int one, int two, int tick) {
+        MidiEvent event = null;
+        try {
+            ShortMessage a = new ShortMessage();
+            a.setMessage(comd, chan, one, two);
+            event = new MidiEvent(a, tick);
+        } catch (Exception e) { e.printStackTrace();}
+        return  event;
+    }
+
     private class MyStartListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-
+            buildTrackAndStart();
         }
     }
 
     private class MyStopListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-
+            sequencer.stop();
         }
     }
 
     private class MySUpTempoListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-
+            float tempoFactor = sequencer.getTempoFactor();
+            sequencer.setTempoInBPM((float) (tempoFactor*1.03));
         }
     }
 
     private class MySDownTempoListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-
+            float tempoFactor = sequencer.getTempoFactor();
+            sequencer.setTempoInBPM((float) (tempoFactor*0.97));
         }
     }
 }
